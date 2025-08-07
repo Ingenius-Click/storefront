@@ -20,18 +20,6 @@ class ListShopProductsAction
             });
         }
 
-        if (isset($filters['search'])) {
-            $query->where('name', 'like', '%' . $filters['search'] . '%');
-        }
-
-        if (isset($filters['sort'])) {
-            $query->orderBy($filters['sort'], $filters['order'] ?? 'asc');
-        } else {
-            $query->latest();
-        }
-
-        $perPage = $filters['per_page'] ?? 15;
-
-        return $query->paginate($perPage);
+        return table_handler_paginate($filters, $query);
     }
 }

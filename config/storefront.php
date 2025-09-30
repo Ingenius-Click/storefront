@@ -23,4 +23,6 @@ return [
     |
     */
     'product_model' => env('PRODUCT_MODEL', env('STOREFRONT_PRODUCT_MODEL', 'Ingenius\Products\Models\Product')),
+    'category_model' => env('CATEGORY_MODEL', env('STOREFRONT_CATEGORY_MODEL', 'Ingenius\Products\Models\Category')),
+
 ];

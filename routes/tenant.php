@@ -21,5 +21,7 @@ Route::middleware([
         Route::get('products', [StorefrontController::class, 'products'])
             ->name('shop.products')
             ->middleware('tenant.has.feature:list-shop-products');
+
+        Route::get('categories', [StorefrontController::class, 'categories'])->name('shop.categories')->middleware('tenant.has.feature:list-shop-products');
     });
 });

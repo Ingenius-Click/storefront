@@ -19,6 +19,11 @@ class ShopCategoryResource extends JsonResource
                 'name' => $this->parent->name,
                 'slug' => $this->parent->slug,
             ] : null,
+            'children' => $this->children?->map(fn($child) => [
+                'id' => $child->id,
+                'name' => $child->name,
+                'slug' => $child->slug,
+            ]),
             'images' => $this->images,
         ];
     }

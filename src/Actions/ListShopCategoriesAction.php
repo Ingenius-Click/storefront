@@ -13,6 +13,7 @@ class ListShopCategoriesAction
 
         $categories = $categoryModel::query()
             ->with('parent')
+            ->whereNull('parent_id')
             ->whereHas('products', function ($query) {
                 $productModel = config('storefront.product_model');
 

@@ -4,7 +4,7 @@ namespace Ingenius\Storefront\Actions;
 
 class ListShopProductsAction
 {
-    public function handle(array $filters = [])
+    public function handle(array $filters = []): array
     {
         $productModel = config('storefront.product_model');
 
@@ -20,6 +20,11 @@ class ListShopProductsAction
             });
         }
 
-        return table_handler_paginate($filters, $query);
+        return table_handler_paginate_with_metadata($filters, $query, function ($filteredQuery) {
+            return [
+                'min_price' => $filteredQuery->min('sale_price'),
+                'max_price' => $filteredQuery->max('sale_price'),
+            ];
+        });
     }
 }

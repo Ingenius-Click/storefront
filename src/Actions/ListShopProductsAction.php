@@ -20,10 +20,12 @@ class ListShopProductsAction
             });
         }
 
-        return table_handler_paginate_with_metadata($filters, $query, function ($filteredQuery) {
+        $previouslyFilteredQuery = $query->clone();
+
+        return table_handler_paginate_with_metadata($filters, $query, function ($filteredQuery) use ($previouslyFilteredQuery) {
             return [
-                'min_price' => $filteredQuery->min('sale_price'),
-                'max_price' => $filteredQuery->max('sale_price'),
+                'min_price' => $previouslyFilteredQuery->min('sale_price'),
+                'max_price' => $previouslyFilteredQuery->max('sale_price'),
             ];
         });
     }

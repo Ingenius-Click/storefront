@@ -7,6 +7,8 @@ use Ingenius\Core\Interfaces\IInventoriable;
 use Ingenius\Core\Interfaces\IPurchasable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\App;
+use Ingenius\Products\Services\ProductExtensionManager;
 
 class ShopProductCardResource extends JsonResource
 {
@@ -34,6 +36,10 @@ class ShopProductCardResource extends JsonResource
         if ($this->resource instanceof IInventoriable) {
             $data['stock'] = $this->resource->getStock();
         }
+
+        // Apply product extensions
+        $extensionManager = App::make(ProductExtensionManager::class);
+        $data = $extensionManager->extendProductArray($this->resource, $data);
 
         return $data;
     }

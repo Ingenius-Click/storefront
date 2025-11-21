@@ -11,6 +11,7 @@ use Ingenius\Storefront\Actions\ListShopProductsAction;
 use Ingenius\Storefront\Actions\MinMaxPricesAction;
 use Ingenius\Storefront\Transformers\ShopCategoryResource;
 use Ingenius\Storefront\Transformers\ShopProductCardResource;
+use Ingenius\Storefront\Transformers\ShopProductOneResource;
 
 class StorefrontController extends Controller
 {
@@ -32,5 +33,14 @@ class StorefrontController extends Controller
         $categories = $listCategoriesAction->handle();
 
         return Response::api(data: ShopCategoryResource::collection($categories), message: 'Categories fetched successfully');
+    }
+
+    public function productOne(Request $request, $productible_id): JsonResponse {
+
+        $productModel = config('storefront.product_model');
+
+        $productible = $productModel::findOrFail($productible_id);
+
+        return Response::api(data: new ShopProductOneResource($productible), message: __('Product show data fetched successfully'));
     }
 }

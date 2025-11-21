@@ -18,10 +18,12 @@ Route::middleware([
     'api',
 ])->prefix('api')->group(function () {
     Route::prefix('shop')->group(function () {
+        Route::get('products/{productible_id}', [StorefrontController::class, 'productOne']);
         Route::get('products', [StorefrontController::class, 'products'])
             ->name('shop.products')
             ->middleware('tenant.has.feature:list-shop-products');
 
         Route::get('categories', [StorefrontController::class, 'categories'])->name('shop.categories')->middleware('tenant.has.feature:list-shop-products');
+
     });
 });

@@ -8,6 +8,7 @@ use Ingenius\Core\Interfaces\IPurchasable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\App;
+use Ingenius\Core\Services\PackageHookManager;
 use Ingenius\Products\Services\ProductExtensionManager;
 
 class ShopProductCardResource extends JsonResource
@@ -29,7 +30,7 @@ class ShopProductCardResource extends JsonResource
         if ($this->resource instanceof IPurchasable) {
             $data['id'] = $this->resource->getId();
             $data['name'] = $this->resource->getName();
-            $data['sale_price'] = $this->resource->getFinalPrice();
+            $data['sale_price'] = $this->resource->getShowcasePrice();
             $data['regular_price'] = $this->resource->getRegularPrice();
         }
 
@@ -38,9 +39,15 @@ class ShopProductCardResource extends JsonResource
         }
 
         // Apply product extensions
-        $extensionManager = App::make(ProductExtensionManager::class);
-        $data = $extensionManager->extendProductArray($this->resource, $data);
+        $hookManager = App::make(PackageHookManager::class);
 
-        return $data;
+        $extraData = $hookManager->execute('product.array.extend', [],  [
+            'product_id' => $this->resource->id,
+            'product_class' => get_class($this->resource),
+            'base_price' => $this->resource->sale_price,
+            'regular_price' => $this->resource->regular_price,
+        ]);
+
+        return array_merge($data, $extraData);
     }
 }

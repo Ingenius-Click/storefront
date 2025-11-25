@@ -32,10 +32,20 @@ class ShopProductCardResource extends JsonResource
             $data['name'] = $this->resource->getName();
             $data['sale_price'] = $this->resource->getShowcasePrice();
             $data['regular_price'] = $this->resource->getRegularPrice();
+            $data['can_be_purchased'] = $this->resource->canBePurchased();
         }
 
         if ($this->resource instanceof IInventoriable) {
             $data['stock'] = $this->resource->getStock();
+        }
+
+        // Add coming soon fields if they exist on the resource
+        if (isset($this->resource->coming_soon)) {
+            $data['coming_soon'] = $this->resource->coming_soon;
+        }
+
+        if (isset($this->resource->available_from)) {
+            $data['available_from'] = $this->resource->available_from;
         }
 
         // Apply product extensions

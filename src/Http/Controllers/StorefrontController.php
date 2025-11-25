@@ -6,6 +6,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Http\Request;
+use Ingenius\Storefront\Actions\GetXBestSellingProductsAction;
 use Ingenius\Storefront\Actions\ListShopCategoriesAction;
 use Ingenius\Storefront\Actions\ListShopProductsAction;
 use Ingenius\Storefront\Actions\ListShopProductsWithDiscountsAction;
@@ -54,6 +55,16 @@ class StorefrontController extends Controller
             data: $shopProducts,
             message: 'Products with discounts fetched successfully',
             params: ['metadata' => $result['metadata']]
+        );
+    }
+
+    public function bestSellingProducts(Request $request, GetXBestSellingProductsAction $action): JsonResponse {
+        $limit = $request->input('limit', 10);
+        $result = $action->handle($limit);
+
+        return Response::api(
+            data: ShopProductCardResource::collection($result),
+            message: 'Best-selling products fetched successfully'
         );
     }
 }

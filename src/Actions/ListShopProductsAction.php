@@ -42,6 +42,12 @@ class ListShopProductsAction
             ]);
         }
 
+        if(isset($filters['coming_soon']) && $filters['coming_soon'] && tenant()->hasFeature('coming-soon-product')) {
+            $query = $this->hookManager->execute('products.query.coming_soon', $query, [
+                'filters' => $filters
+            ]);
+        }
+
         return table_handler_paginate_with_metadata($filters, $query, function ($filteredQuery) use ($previouslyFilteredQuery) {
             return [
                 'min_price' => $previouslyFilteredQuery->min('sale_price'),

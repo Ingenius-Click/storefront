@@ -26,6 +26,8 @@ class ListShopProductsAction
             });
         }
 
+        $previouslyFilteredQuery = $query->clone();
+
         // Execute hook to get products with discounts if filters request it
         // If discounts package is not installed, this will return the original query
         if(isset($filters['with_discounts']) && $filters['with_discounts']) {
@@ -34,7 +36,11 @@ class ListShopProductsAction
             ]);
         }
 
-        $previouslyFilteredQuery = $query->clone();
+        if(isset($filters['best_selling']) && $filters['best_selling']) {
+            $query = $this->hookManager->execute('products.query.best_selling', $query, [
+                'filters' => $filters
+            ]);
+        }
 
         return table_handler_paginate_with_metadata($filters, $query, function ($filteredQuery) use ($previouslyFilteredQuery) {
             return [

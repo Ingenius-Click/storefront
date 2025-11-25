@@ -22,11 +22,11 @@ class ShopProductOneResource extends JsonResource {
         }
 
         // Add coming soon fields if they exist on the resource
-        if (isset($this->resource->coming_soon)) {
+        if (isset($this->resource->coming_soon) && tenant()->hasFeature('coming-soon-product')) {
             $data['coming_soon'] = $this->resource->coming_soon;
         }
 
-        if (isset($this->resource->available_from)) {
+        if (isset($this->resource->available_from) && tenant()->hasFeature('coming-soon-product')) {
             $data['available_from'] = $this->resource->available_from;
         }
 

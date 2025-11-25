@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Response;
 use Illuminate\Http\Request;
 use Ingenius\Storefront\Actions\ListShopCategoriesAction;
 use Ingenius\Storefront\Actions\ListShopProductsAction;
+use Ingenius\Storefront\Actions\ListShopProductsWithDiscountsAction;
 use Ingenius\Storefront\Actions\MinMaxPricesAction;
 use Ingenius\Storefront\Transformers\ShopCategoryResource;
 use Ingenius\Storefront\Transformers\ShopProductCardResource;
@@ -42,5 +43,17 @@ class StorefrontController extends Controller
         $productible = $productModel::findOrFail($productible_id);
 
         return Response::api(data: new ShopProductOneResource($productible), message: __('Product show data fetched successfully'));
+    }
+
+    public function productsWithDiscounts(Request $request, ListShopProductsWithDiscountsAction $action): JsonResponse {
+        $result = $action->handle($request->all());
+
+        $shopProducts = $result['paginator']->through(fn($product) => new ShopProductCardResource($product));
+
+        return Response::api(
+            data: $shopProducts,
+            message: 'Products with discounts fetched successfully',
+            params: ['metadata' => $result['metadata']]
+        );
     }
 }

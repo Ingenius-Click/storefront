@@ -2,8 +2,14 @@
 
 namespace Ingenius\Storefront\Actions;
 
+use Ingenius\Core\Services\PackageHookManager;
+
 class ListShopProductsAction
 {
+    public function __construct(
+        protected PackageHookManager $hookManager
+    ) {}
+
     public function handle(array $filters = []): array
     {
         $productModel = config('storefront.product_model');
@@ -18,6 +24,14 @@ class ListShopProductsAction
             $query->whereHas('categories', function ($query) use ($filters) {
                 $query->where('categories.id', $filters['category_id']);
             });
+        }
+
+        // Execute hook to get products with discounts if filters request it
+        // If discounts package is not installed, this will return the original query
+        if(isset($filters['with_discounts']) && $filters['with_discounts']) {
+            $query = $this->hookManager->execute('products.query.with_discounts', $query, [
+                'filters' => $filters
+            ]);
         }
 
         $previouslyFilteredQuery = $query->clone();

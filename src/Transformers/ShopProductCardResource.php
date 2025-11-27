@@ -30,8 +30,10 @@ class ShopProductCardResource extends JsonResource
         if ($this->resource instanceof IPurchasable) {
             $data['id'] = $this->resource->getId();
             $data['name'] = $this->resource->getName();
-            $data['sale_price'] = $this->resource->getShowcasePrice();
-            $data['regular_price'] = $this->resource->getRegularPrice();
+
+            // Prices are stored in base currency, convert to current currency
+            $data['sale_price'] = convert_currency($this->resource->getShowcasePrice());
+            $data['regular_price'] = convert_currency($this->resource->getRegularPrice());
             $data['can_be_purchased'] = $this->resource->canBePurchased();
         }
 
@@ -57,6 +59,9 @@ class ShopProductCardResource extends JsonResource
             'base_price' => $this->resource->sale_price,
             'regular_price' => $this->resource->regular_price,
         ]);
+
+        // Add currency metadata
+        $data['currency'] = get_currency_metadata();
 
         return array_merge($data, $extraData);
     }

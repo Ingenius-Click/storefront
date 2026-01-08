@@ -36,6 +36,7 @@ class ShopCategoryResource extends JsonResource
                 'name' => $child->parent->name,
                 'slug' => $child->parent->slug,
             ] : null,
+            'images' => $child->images,
             'children' => $this->recursiveChildren($child),
         ]);
     }

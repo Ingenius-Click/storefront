@@ -53,6 +53,8 @@ class ListShopProductsAction
                 'min_price' => $previouslyFilteredQuery->min('sale_price'),
                 'max_price' => $previouslyFilteredQuery->max('sale_price'),
             ];
-        });
+        }
+        , app()->make(\Ingenius\Products\Services\ProductGenericTableHandler::class)
+        );
     }
 }

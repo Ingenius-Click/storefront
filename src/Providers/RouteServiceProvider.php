@@ -3,6 +3,7 @@
 namespace Ingenius\Storefront\Providers;
 
 use Ingenius\Core\Http\Middleware\InitializeTenancyByRequestData;
+use Ingenius\Core\Services\TenantMiddlewareManager;
 
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Route;
@@ -70,6 +71,7 @@ class RouteServiceProvider extends ServiceProvider
         if (file_exists($routeFile)) {
             Route::middleware([
                 InitializeTenancyByRequestData::class,
+                ...TenantMiddlewareManager::all(),
             ])->group(function () use ($routeFile) {
                 require $routeFile;
             });

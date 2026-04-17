@@ -6,7 +6,9 @@ use Illuminate\Routing\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Http\Request;
+use Ingenius\Products\Models\AttributeOption;
 use Ingenius\Products\Services\ProductPriceCacheService;
+use Ingenius\Storefront\Actions\DynamicAttributesAvailabilityAction;
 use Ingenius\Storefront\Actions\GetXBestSellingProductsAction;
 use Ingenius\Storefront\Actions\ListShopCategoriesAction;
 use Ingenius\Storefront\Actions\ListShopProductsAction;
@@ -80,5 +82,24 @@ class StorefrontController extends Controller
             data: ShopProductCardResource::collection($result),
             message: 'Best-selling products fetched successfully'
         );
+    }
+
+    public function checkNextAttributeAvailability(Request $request, int $productible_id, DynamicAttributesAvailabilityAction $action): JsonResponse {
+
+        $productModel = config('storefront.product_model');
+
+        $productible = $productModel::findOrFail($productible_id);
+
+        $selectedAttributesOptionsIds = $request->input('selected_attributes_options', []);
+
+        $selectedAttributesOptions = AttributeOption::whereIn('id', $selectedAttributesOptionsIds)->get();
+
+        $availability = $action($productible, $selectedAttributesOptions->all());
+
+        return Response::api(
+            data: $availability,
+            message: 'Attribute availability checked successfully'
+        );
+
     }
 }

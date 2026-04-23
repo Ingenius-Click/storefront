@@ -50,6 +50,10 @@ class ShopProductCardResource extends JsonResource
             $data['available_from'] = $this->resource->available_from;
         }
 
+        if (method_exists($this->resource, 'hasVariants')) {
+            $data['has_variants'] = $this->resource->hasVariants();
+        }
+
         // Apply product extensions
         $hookManager = App::make(PackageHookManager::class);
 

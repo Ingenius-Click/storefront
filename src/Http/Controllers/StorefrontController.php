@@ -13,10 +13,10 @@ use Ingenius\Storefront\Actions\GetXBestSellingProductsAction;
 use Ingenius\Storefront\Actions\ListShopCategoriesAction;
 use Ingenius\Storefront\Actions\ListShopProductsAction;
 use Ingenius\Storefront\Actions\ListShopProductsWithDiscountsAction;
-use Ingenius\Storefront\Actions\MinMaxPricesAction;
 use Ingenius\Storefront\Transformers\ShopCategoryResource;
 use Ingenius\Storefront\Transformers\ShopProductCardResource;
 use Ingenius\Storefront\Transformers\ShopProductOneResource;
+use Ingenius\Storefront\Transformers\ShopProductVariationResource;
 
 class StorefrontController extends Controller
 {
@@ -82,6 +82,51 @@ class StorefrontController extends Controller
             data: ShopProductCardResource::collection($result),
             message: 'Best-selling products fetched successfully'
         );
+    }
+
+    public function productVariations(Request $request, $productible_id): JsonResponse {
+
+        $productModel = config('storefront.product_model');
+
+        $productible = $productModel::findOrFail($productible_id);
+
+        $variations = $productible->variants()->get();
+
+        // Warm the price cache for all variations before transformation
+        $this->priceCache->warmBulkPrices($variations->all());
+
+        return Response::api(data: ShopProductVariationResource::collection($variations), message: __('Product variations fetched successfully'));
+    }
+
+    public function productAttributes(Request $request, $productible_id): JsonResponse {
+
+        $productModel = config('storefront.product_model');
+
+        $productible = $productModel::findOrFail($productible_id);
+
+        if(!$productible->hasVariants()) {
+            return Response::api(data: [], message: __('Product has no variations'));
+        }
+
+        // Get all attribute option IDs used by this product's variants
+        $usedOptionIds = $productible->variants()
+            ->with('attributeOptions')
+            ->get()
+            ->pluck('attributeOptions')
+            ->flatten()
+            ->pluck('id')
+            ->unique();
+
+        // Load product attributes with only the options that are actually used by variants
+        $attributes = $productible->attributes()
+            ->with(['options' => function ($query) use ($usedOptionIds) {
+                $query->whereIn('id', $usedOptionIds);
+            }])
+            ->get()
+            ->filter(fn ($attribute) => $attribute->options->isNotEmpty())
+            ->values();
+
+        return Response::api(data: $attributes, message: __('Product attributes fetched successfully'));
     }
 
     public function checkNextAttributeAvailability(Request $request, int $productible_id, DynamicAttributesAvailabilityAction $action): JsonResponse {

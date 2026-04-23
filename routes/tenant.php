@@ -31,6 +31,14 @@ Route::middleware([
 
         Route::get('categories', [StorefrontController::class, 'categories'])->name('shop.categories')->middleware('tenant.has.feature:list-shop-products');
 
+        Route::get('/products/{productible_id}/variations', [StorefrontController::class, 'productVariations'])
+            ->name('shop.product.variations')
+            ->middleware('tenant.has.feature:manage-variants');
+
+        Route::get('/products/{productible_id}/attributes', [StorefrontController::class, 'productAttributes'])
+            ->name('shop.product.attributes')
+            ->middleware('tenant.has.feature:manage-variants');
+
         Route::get('products/{productible_id}/check-next-attribute-availability', [StorefrontController::class, 'checkNextAttributeAvailability'])
             ->name('shop.check-next-attribute-availability')
             ->middleware('tenant.has.feature:manage-variants');
